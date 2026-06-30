@@ -283,7 +283,7 @@ firestore/
 
 <div align="center">
 
-**Built for the Excelerate Mobile Internship 2024**
+**Built for the Excelerate Mobile Internship 2026**
 
 [![Flutter](https://img.shields.io/badge/Made%20with-Flutter-02569B?style=flat&logo=flutter)](https://flutter.dev)
 [![Firebase](https://img.shields.io/badge/Powered%20by-Firebase-FFCA28?style=flat&logo=firebase&logoColor=black)](https://firebase.google.com)
