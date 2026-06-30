@@ -45,10 +45,10 @@ When a new user registers, the app walks them through a smart **Onboarding Quiz*
 From there, learners can:
 - Track their progress through each program
 - Earn and view digital certificates
-- Give real-time feedback to administrators via **Feedback System**
+- Give real-time feedback to administrators
 - Explore new opportunities matched to their profile
 
-Administrators also have their own dedicated dashboards — making Pathfinder a complete two-sided platform.
+Administrators have their own dedicated dashboards — making Pathfinder a complete two-sided platform.
 
 ---
 
@@ -82,21 +82,25 @@ Excelerate Pathfinder is built as a **two-sided platform**, with a dedicated exp
 ```
 Excelerate Pathfinder
 ├──  Learner Side
-│   ├── Sign Up / Login / Google Sign-In
+│   ├── Sign Up / Login (Email & Google)
 │   ├── Onboarding Quiz
-│   ├── Personalised Home / Roadmap
-│   ├── Browse & Explore Programs
-│   ├── Learning Hub (Progress Tracker)
+│   ├── Personalised Dashboard (Roadmap)
+│   ├── Explore & Browse Programs
+│   ├── Learning Hub (Enrolled Courses)
+│   ├── Program Progress Tracker
+│   ├── Announcements & Notifications
 │   ├── Verified Certificates (Landscape View)
 │   ├── Feedback Submission
 │   └── Profile Management
 │
 └── Admin Side
     ├── Admin Login
-    ├── Dashboard Overview & Analytics
-    ├── User Management (Student monitoring)
-    ├── Program Management (CRUD)
-    └── Announcement Management
+    ├── Dashboard Overview (Stats)
+    ├── User Management (Student Directory)
+    ├── Program Management (Full CRUD)
+    ├── Announcement Management
+    ├── Audit Logs (Action Tracking)
+    └── Admin Profile & Settings
 ```
 
 ---
@@ -104,47 +108,33 @@ Excelerate Pathfinder
 ## Key Features
 
 ### Smart Onboarding Quiz
-New users are guided through a short, friendly quiz when they first register. Questions cover:
-- Are you a beginner, intermediate, or advanced learner?
-- What is your career goal?
-- What field are you most interested in?
-
-The app uses these responses to tailor the experience to the learner's specific needs.
+New users are guided through a short, friendly quiz when they first register. The results are stored in Firestore and used to calculate a personalized entry point into the Excelerate ecosystem.
 
 ---
 
 ### Personalised Learning Roadmap
-Based on the onboarding quiz, the app generates a curated list of recommended programs — ordered by fit and goal alignment. Learners always know what to do next.
+The Home screen serves as a dynamic roadmap, highlighting programs that match the user's skill level and career field identified during onboarding.
 
 ---
 
-### Learning Hub & Progress Tracker
-Every enrolled program shows a live progress indicator. Learners can see what they have completed and what percentage remains, keeping motivation high through visual feedback.
+### Progress Tracker & Learning Hub
+A dedicated "Learning Hub" allows students to track their progress across multiple programs. Visual progress bars and percentage indicators provide immediate feedback on their journey.
 
 ---
 
-### Verified Certificates
-Upon program completion, learners can view formal certificates. The app includes a specialized landscape-oriented certificate viewer for a professional experience.
+### Professional Certificates
+Upon completion, the app generates a formal certificate. A custom landscape view provides a high-fidelity visual representation of the learner's achievement.
 
 ---
 
-### Real-time Feedback
-A dedicated feedback system allows learners to share their insights and suggestions directly with the platform. This data is stored in Firestore for administrative review.
-
----
-
-### Admin Dashboard & Program Management
-Administrators have a robust portal to:
-- View high-level metrics of platform activity (Analytics)
-- Create, edit, and manage programs in the live catalog
-- Monitor and manage user accounts
-- Publish announcements to all learners
+### Admin Portal & Audit Logs
+Administrators have total control over the platform's content. Every administrative action (Create, Edit, Delete) is logged in an **Audit Trail** for security and transparency.
 
 ---
 
 ## Screenshots
 
-*(Upload and link your app screenshots here to showcase the UI)*
+*(Add screenshots to the repository and update links below)*
 
 ---
 
@@ -154,24 +144,15 @@ Administrators have a robust portal to:
 |---|---|
 | **Frontend** | Flutter (Dart) |
 | **Backend / Database** | Firebase (Cloud Firestore) |
-| **Authentication** | Firebase Authentication + Google Sign-In |
-| **Real-time Sync** | Firestore real-time listeners (StreamBuilders) |
-| **UI Enhancements** | Flutter Animate, Confetti, Material 3 |
-
-### Flutter & Dart
-The entire UI is built with Flutter using a component-based architecture. A centralized theme system (`lib/theme/`) ensures consistent branding across both Admin and Learner roles.
-
-### Firebase
-Firebase powers the entire backend:
-- **Firebase Auth** — handles email/password and Google OAuth flows.
-- **Cloud Firestore** — NoSQL database for users, programs, certificates, and feedback.
-- **Real-time Sync** — Ensures dashboards and progress bars update instantly.
+| **Authentication** | Firebase Authentication & Google Sign-In |
+| **Real-time Sync** | Firestore StreamBuilder |
+| **Theming** | Custom Design System (Material 3) |
 
 ---
 
 ## Project Dependencies
 
-### `pubspec.yaml` — Key Dependencies
+### `pubspec.yaml`
 
 ```yaml
 dependencies:
@@ -189,14 +170,13 @@ dependencies:
 
 ## Firebase Configuration
 
-Firebase must be configured for the project to run correctly.
-
 ### Required Configuration Files
 
 | Platform | File Location |
 |---|---|
 | **Android** | `android/app/google-services.json` |
 | **iOS** | `ios/Runner/GoogleService-Info.plist` |
+| **Dart Config** | `lib/firebase_options.dart` |
 
 ---
 
@@ -208,16 +188,12 @@ git clone https://github.com/Kkarthik23540/excelerate-pathfinder.git
 cd excelerate-pathfinder
 ```
 
-### Step 2 — Add Firebase Config
-Place your `google-services.json` in `android/app/` and ensure `firebase_options.dart` is correctly configured in `lib/`.
+### Step 2 — Add Configuration
+Add your `google-services.json` to the `android/app/` folder.
 
-### Step 3 — Install Dependencies
+### Step 3 — Install & Run
 ```bash
 flutter pub get
-```
-
-### Step 4 — Run the Application
-```bash
 flutter run
 ```
 
@@ -225,37 +201,58 @@ flutter run
 
 ## Backend Architecture
 
+### Project Structure (lib/)
+
+```
+lib/
+├── main.dart                 # Entry point
+├── firebase_options.dart     # Firebase Config
+├── theme/
+│   └── app_theme_splash.dart # Centralized Styles
+├── widgets/
+│   ├── admin_bottom_nav.dart # Admin Navigation
+│   └── learner_bottom_nav.dart # Learner Navigation
+└── screens/
+    ├── splash_screen.dart    # Role-based Routing
+    ├── admin/                # Admin Portal Screens
+    │   ├── admin_home_screen.dart
+    │   ├── admin_users_screen.dart
+    │   ├── admin_programs_screen.dart
+    │   └── ...
+    └── learner/              # Learner Side Screens
+        ├── learner_home_screen.dart
+        ├── learner_onboarding_quiz_screen.dart
+        ├── learner_learning_screen.dart
+        └── ...
+```
+
 ### Firestore Data Structure
 
 ```
 firestore/
 │
-├── users/ (User profiles & roles)
-├── programs/ (Learning opportunities)
-├── announcements/ (System-wide notices)
-├── feedback/ (Learner submissions)
-├── achievements/ (User XP, levels, and badges)
-└── audit_logs/ (Administrative action tracking)
+├── users/            # Profiles, Roles (Learner/Admin)
+├── programs/         # Learning Opportunities (CRUD)
+├── announcements/    # Real-time System Notices
+├── achievements/     # XP, Levels, Certificates
+├── feedback/         # Learner Submission Data
+└── audit_logs/       # Admin Action History
 ```
 
 ---
 
 ## Contribution Log & Changelog
 
-### Version History
-**v1.0.0** — Internship Final Submission (June 2024)
-
-### Feature Changelog
+### Feature Roadmap (v1.0.0)
 
 | Feature | Description | Status |
 |---|---|---|
-| **Auth System** | Email/Password & Google login with role-based routing | ✅ Done |
-| **Admin CRUD** | Full Create/Read/Update/Delete for programs & announcements | ✅ Done |
-| **Onboarding** | Smart quiz system with data persistence | ✅ Done |
-| **Learning Hub** | Real-time progress tracking and enrollment management | ✅ Done |
-| **Certificates** | Professional landscape certificate generator | ✅ Done |
-| **Audit Logs** | Backend tracking of all administrative actions | ✅ Done |
-| **UI Polish** | Custom animations, confetti, and unified branding | ✅ Done |
+| **Auth** | Dual authentication flows (Learner/Admin) | ✅ Done |
+| **Quiz** | Onboarding system with Firestore persistence | ✅ Done |
+| **CRUD** | Program management portal for Administrators | ✅ Done |
+| **Hub** | Real-time progress and enrollment tracking | ✅ Done |
+| **Cert** | Specialized landscape certificate viewer | ✅ Done |
+| **Logs** | Security-focused audit logging system | ✅ Done |
 
 ---
 
