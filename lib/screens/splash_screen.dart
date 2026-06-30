@@ -1,7 +1,11 @@
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import '../theme/app_theme_splash.dart';
-import 'admin_login_screen.dart';
-import 'learner_login_screen.dart';
+import 'admin/admin_home_screen.dart';
+import 'learner/learner_home_screen.dart';
+import 'admin/admin_login_screen.dart';
+import 'learner/learner_login_screen.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -93,7 +97,41 @@ class _SplashScreenState extends State<SplashScreen>
     await Future.delayed(const Duration(milliseconds: 400));
     _progressController.forward();
 
-    await Future.delayed(const Duration(milliseconds: 2000));
+    // ✅ CHECK AUTH STATE
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      // User is logged in, fetch role
+      try {
+        final doc = await FirebaseFirestore.instance
+            .collection('users')
+            .doc(user.uid)
+            .get();
+        
+        if (doc.exists) {
+          final role = doc.data()?['role'] ?? 'learner';
+          await Future.delayed(const Duration(milliseconds: 1000));
+          
+          if (!mounted) return;
+          if (role == 'admin') {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (_) => const AdminHomeScreen()),
+            );
+          } else {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (_) => const LearnerHomeScreen()),
+            );
+          }
+          return;
+        }
+      } catch (e) {
+        debugPrint('Persistent login error: $e');
+      }
+    }
+
+    // If not logged in or error, show buttons
+    await Future.delayed(const Duration(milliseconds: 1500));
     if (mounted) {
       setState(() => _showButtons = true);
       _buttonsController.forward();

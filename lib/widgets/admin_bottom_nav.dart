@@ -2,12 +2,12 @@
 import 'package:flutter/material.dart';
 
 // ✅ Admin Screens - matching your file names exactly
-import '../screens/admin_home_screen.dart';
-import '../screens/admin_users_screen.dart';
-import '../screens/admin_programs_screen.dart';
-import '../screens/admin_announcements_screen.dart';
-import '../screens/admin_analytics_screen.dart';
-import '../screens/admin_profile_screen.dart';
+import '../screens/admin/admin_home_screen.dart';
+import '../screens/admin/admin_users_screen.dart';
+import '../screens/admin/admin_programs_screen.dart';
+import '../screens/admin/admin_announcements_screen.dart';
+import '../screens/admin/admin_analytics_screen.dart';
+import '../screens/admin/admin_profile_screen.dart';
 
 // Color constants (matching learner style)
 const kPrimary = Color(0xFFE0194A);
