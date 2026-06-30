@@ -245,12 +245,15 @@ lib/
 ```
 firestore/
 │
-├── users/            # Profiles, Roles (Learner/Admin)
-├── programs/         # Learning Opportunities (CRUD)
-├── announcements/    # Real-time System Notices
-├── achievements/     # XP, Levels, Certificates
-├── feedback/         # Learner Submission Data
-└── audit_logs/       # Admin Action History
+├── users/            # User profiles, authentication data, and roles
+├── programs/         # Comprehensive catalog of learning opportunities (Full CRUD)
+├── announcements/    # Real-time system-wide notices and updates
+├── achievements/     # Learner XP, levels, and unlocked milestones
+├── certificates/     # Issued digital credentials and completion data
+├── enrollments/      # Mapping of learners to their active programs
+├── feedback/         # Direct learner insights and program ratings
+├── learnerProfiles/  # Specialized data from the onboarding quiz
+└── audit_logs/       # Immutable history of administrative actions
 ```
 
 ---
