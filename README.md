@@ -273,11 +273,41 @@ firestore/
 
 ---
 
-## 👤 Developer
+### Known Issues & Future Improvements
 
-**K Karthik Reddy**
-[GitHub Profile](https://github.com/Kkarthik23540)
-*Excelerate Mobile Development Intern*
+| # | Item | Priority |
+|---|---|---|
+| 01 | Push notifications for program reminders | Medium |
+| 02 | Offline caching with Firestore persistence | High |
+| 03 | Native video player for curriculum content | Medium |
+| 04 | Social share deep-link for credentials (Open Graph) | Low |
+| 05 | Admin analytics charts (enrolment trends, completion rates) | Medium |
+| 06 | Automated Firestore security rules for production | High |
+
+---
+
+## 👥 Team
+
+**Project:** `excelerate-mobile-team4`  
+**Internship:** Excelerate Mobile Development Internship  
+**Cohort:** 2026  
+
+**Members:**
+
+- **Grace Nwakeze** ([gracenkirukanmd@gmail.com](mailto:gracenkirukanmd@gmail.com)) — Frontend lead (UI/UX)
+- **Hafiz Saleh** ([hafizsaleh1496@gmail.com](mailto:hafizsaleh1496@gmail.com)) — Frontend
+- **Jumoke Kazeem** ([kazeemjumoke12@gmail.com](mailto:kazeemjumoke12@gmail.com)) — Team lead (Backend)
+- **K Karthik Reddy** ([kurmathikarthik@gmail.com](mailto:kurmathikarthik@gmail.com)) — Frontend (Code inspector)
+- **Karizza Peligro** ([peligrokarizza@gmail.com](mailto:peligrokarizza@gmail.com)) — Backend (Firebase)
+- **SANSKAR MUNESHWAR** ([sanskarmuneshwar2004@gmail.com](mailto:sanskarmuneshwar2004@gmail.com)) — Frontend/backend (Tester)
+- **V S Sujithraa** ([sujithraasudhakar02@gmail.com](mailto:sujithraasudhakar02@gmail.com)) — Backend
+
+| Role | Responsibility |
+|---|---|
+| Mobile Developers | Flutter UI screens, widget architecture, Dart business logic |
+| Backend Integration | Firebase setup, Firestore schema design, Auth service |
+| UI/UX Design | Screen designs (Figma → Flutter) for all three user roles |
+| QA & Testing | Device testing on Android and iOS simulators |
 
 ---
 
