@@ -10,7 +10,7 @@ Excelerate Pathfinder is a comprehensive learning management application built w
 - **Program Details**: View curriculum, instructor details, and enroll with a single tap.
 - **Achievements & Badges**: Unlockable badges with confetti celebrations upon reaching milestones.
 - **Feedback System**: Integrated form with validation to provide feedback directly to the administration.
-- **Mock Data Integration**: Announcements section powered by local JSON data for rapid information delivery.
+- **Real-time Announcements**: Stay updated with the latest news and notifications fetched live from Cloud Firestore.
 
 ### For Admins
 - **Program Management**: Full CRUD capabilities to add, view, and delete programs from the live catalog.
@@ -20,14 +20,14 @@ Excelerate Pathfinder is a comprehensive learning management application built w
 ## 🛠 Tech Stack
 - **Frontend**: Flutter (Dart)
 - **Backend**: Firebase Authentication & Cloud Firestore
-- **Data Formats**: JSON (for local mock data & announcements)
+- **Data Management**: Firebase Firestore for all dynamic content (Programs, Announcements, User Data)
 - **Animations**: Flutter Animate, Confetti, and Custom Tween Animations
 - **State Management**: StatefulWidget with StreamBuilders for real-time updates
 
 ## 📂 Project Structure
 - `lib/screens/`: Contains all UI screens for both Admin and Learner roles.
 - `lib/widgets/`: Reusable UI components like navigation bars.
-- `assets/data/`: JSON files used for mock API data requirements.
+- `lib/theme/`: Centralized design tokens and app-wide styling configuration.
 - `lib/main.dart`: Application entry point and theme configuration.
 
 ## 🚀 Getting Started
@@ -40,7 +40,7 @@ Excelerate Pathfinder is a comprehensive learning management application built w
 ### Setup Instructions
 1. **Clone the repository**:
    ```bash
-   git clone https://github.com/your-username/excelerate_pathfinder.git
+   git clone https://github.com/Kkarthik23540/excelerate-pathfinder.git
    ```
 2. **Install dependencies**:
    ```bash
@@ -53,14 +53,30 @@ Excelerate Pathfinder is a comprehensive learning management application built w
    flutter run
    ```
 
-## 📈 Deliverable Progress
+## 📜 Changelog
 
-| Week | Status | Focus |
-| :--- | :--- | :--- |
-| **Week 1** | ✅ Complete | Proposal, Wireframes, and Project Setup |
-| **Week 2** | ✅ Complete | UI Prototyping and Navigation |
-| **Week 3** | ✅ Complete | Firebase Integration, JSON Data, and Form Validation |
-| **Week 4** | ✅ Complete | Final Polishing, Admin Management, and Documentation |
+### Week 4 (Final Release)
+- Finalized Admin Portal with full Program Management (CRUD).
+- Enhanced UX with logo animations and confetti effects.
+- Implemented landscape-only Certificate View.
+- Completed final documentation and README polishing.
+
+### Week 3
+- Integrated Firebase Authentication (Email/Password & Google Sign-in).
+- Connected UI to live Firestore collections for Programs and Announcements.
+- Added Feedback Form with real-time validation and Firestore submission.
+
+### Week 2
+- Built core UI screens for Learners (Home, Browse, Profile, Learning Hub).
+- Implemented role-based navigation logic in SplashScreen.
+- Applied consistent branding using a centralized theme.
+
+### Week 1
+- Initialized Flutter project and GitHub repository.
+- Defined app architecture and project proposal.
+
+## 📸 Screenshots
+*(Add your app screenshots here to showcase your hard work!)*
 
 ---
 *Developed as part of the Excelerate Internship Program.*
