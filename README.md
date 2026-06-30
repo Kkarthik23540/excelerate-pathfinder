@@ -17,7 +17,7 @@
 
 ---
 
-## Table of Contents
+## 📑 Table of Contents
 
 - [Project Overview](#-project-overview)
 - [Why Excelerate Pathfinder?](#-why-excelerate-pathfinder)
@@ -34,7 +34,7 @@
 
 ---
 
-## Project Overview
+## 🚀 Project Overview
 
 One of the biggest challenges for new learners on Excelerate is knowing **where to begin**. With a growing catalogue of programs and opportunities, first-time users often feel overwhelmed and register for courses without a clear sense of direction — leading to low engagement and high dropout rates.
 
@@ -52,7 +52,7 @@ Administrators have their own dedicated dashboards — making Pathfinder a compl
 
 ---
 
-## Why Excelerate Pathfinder?
+## 💡 Why Excelerate Pathfinder?
 
 ### Benefits to Excelerate (the Platform)
 
@@ -75,7 +75,7 @@ Administrators have their own dedicated dashboards — making Pathfinder a compl
 
 ---
 
-## App Structure & User Roles
+## 🏗 App Structure & User Roles
 
 Excelerate Pathfinder is built as a **two-sided platform**, with a dedicated experience for each type of user.
 
@@ -105,7 +105,7 @@ Excelerate Pathfinder
 
 ---
 
-## Key Features
+## 🛠 Key Features
 
 ### Smart Onboarding Quiz
 New users are guided through a short, friendly quiz when they first register. The results are stored in Firestore and used to calculate a personalized entry point into the Excelerate ecosystem.
@@ -132,13 +132,13 @@ Administrators have total control over the platform's content. Every administrat
 
 ---
 
-## Screenshots
+## 📸 Screenshots
 
 *(Add screenshots to the repository and update links below)*
 
 ---
 
-## Technology Stack
+## 💻 Technology Stack
 
 | Layer | Technology |
 |---|---|
@@ -150,7 +150,7 @@ Administrators have total control over the platform's content. Every administrat
 
 ---
 
-## Project Dependencies
+## 📦 Project Dependencies
 
 ### `pubspec.yaml`
 
@@ -168,7 +168,7 @@ dependencies:
 
 ---
 
-## Firebase Configuration
+## 🔥 Firebase Configuration
 
 ### Required Configuration Files
 
@@ -180,7 +180,7 @@ dependencies:
 
 ---
 
-## Setup & Installation
+## ⚙️ Setup & Installation
 
 ### Step 1 — Clone the Repository
 ```bash
@@ -199,31 +199,45 @@ flutter run
 
 ---
 
-## Backend Architecture
+## 🏛 Backend Architecture
 
-### Project Structure (lib/)
+### Complete Project Structure (lib/)
 
 ```
 lib/
-├── main.dart                 # Entry point
-├── firebase_options.dart     # Firebase Config
+├── firebase_options.dart
+├── main.dart
+├── screens/
+│   ├── splash_screen.dart
+│   ├── admin/
+│   │   ├── admin_analytics_screen.dart
+│   │   ├── admin_announcements_screen.dart
+│   │   ├── admin_home_screen.dart
+│   │   ├── admin_login_screen.dart
+│   │   ├── admin_profile_screen.dart
+│   │   ├── admin_programs_screen.dart
+│   │   ├── admin_users_screen.dart
+│   │   └── admin_user_details_screen.dart
+│   └── learner/
+│       ├── learner_announcements_screen.dart
+│       ├── learner_browse_programs_screen.dart
+│       ├── learner_explore_screen.dart
+│       ├── learner_feedback_screen.dart
+│       ├── learner_forgot_password_screen.dart
+│       ├── learner_home_screen.dart
+│       ├── learner_learning_screen.dart
+│       ├── learner_login_screen.dart
+│       ├── learner_onboarding_quiz_screen.dart
+│       ├── learner_profile_screen.dart
+│       ├── learner_program_details_screen.dart
+│       ├── learner_progress_screen.dart
+│       ├── learner_quick_links_screen.dart
+│       └── learner_signup_screen.dart
 ├── theme/
-│   └── app_theme_splash.dart # Centralized Styles
-├── widgets/
-│   ├── admin_bottom_nav.dart # Admin Navigation
-│   └── learner_bottom_nav.dart # Learner Navigation
-└── screens/
-    ├── splash_screen.dart    # Role-based Routing
-    ├── admin/                # Admin Portal Screens
-    │   ├── admin_home_screen.dart
-    │   ├── admin_users_screen.dart
-    │   ├── admin_programs_screen.dart
-    │   └── ...
-    └── learner/              # Learner Side Screens
-        ├── learner_home_screen.dart
-        ├── learner_onboarding_quiz_screen.dart
-        ├── learner_learning_screen.dart
-        └── ...
+│   └── app_theme_splash.dart
+└── widgets/
+    ├── admin_bottom_nav.dart
+    └── learner_bottom_nav.dart
 ```
 
 ### Firestore Data Structure
@@ -241,7 +255,7 @@ firestore/
 
 ---
 
-## Contribution Log & Changelog
+## 📝 Contribution Log & Changelog
 
 ### Feature Roadmap (v1.0.0)
 
@@ -256,7 +270,7 @@ firestore/
 
 ---
 
-## Developer
+## 👤 Developer
 
 **K Karthik Reddy**
 [GitHub Profile](https://github.com/Kkarthik23540)
