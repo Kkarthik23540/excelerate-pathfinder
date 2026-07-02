@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:url_launcher/url_launcher.dart'; // ✅ Added for live links
 
 // Color constants (matches home + profile screens)
 const kPrimary = Color(0xFFE0194A);
@@ -55,6 +56,26 @@ class _LearnerProgramDetailsScreenState
 
   Future<void> _enrollInProgram() async {
     if (_userId == null || _isEnrolling) return;
+
+    // ✅ ADDED: Confirmation Dialog
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: const Text('Enroll in Program?', style: TextStyle(fontWeight: FontWeight.w900)),
+        content: Text('Are you ready to start your journey with ${widget.program['title']}?'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Maybe later')),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(context, true),
+            style: ElevatedButton.styleFrom(backgroundColor: kPrimary, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
+            child: const Text('Yes, let\'s go!', style: TextStyle(color: Colors.white)),
+          ),
+        ],
+      ),
+    );
+
+    if (confirm != true) return;
 
     setState(() => _isEnrolling = true);
     try {
@@ -201,6 +222,8 @@ class _LearnerProgramDetailsScreenState
                   const SizedBox(height: 20),
                   _buildHeader(title, iconColor, iconCode),
                   const SizedBox(height: 20),
+                  _buildLiveSessionBanner(), // ✅ Added Live Session Banner
+                  const SizedBox(height: 10),
                   _buildProgressCard(modules),
                   const SizedBox(height: 20),
                   _buildAboutSection(description),
@@ -264,6 +287,47 @@ class _LearnerProgramDetailsScreenState
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildLiveSessionBanner() {
+    return StreamBuilder<DocumentSnapshot>(
+      stream: FirebaseFirestore.instance.collection('live_sessions').doc(widget.program['id']).snapshots(),
+      builder: (context, snapshot) {
+        if (!snapshot.hasData || !snapshot.data!.exists) return const SizedBox.shrink();
+        final data = snapshot.data!.data() as Map<String, dynamic>;
+        if (data['isLive'] != true) return const SizedBox.shrink();
+
+        return Container(
+          margin: const EdgeInsets.only(bottom: 12),
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: Colors.redAccent.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: Colors.redAccent, width: 1.5),
+          ),
+          child: Row(
+            children: [
+              const Icon(Icons.video_camera_front_rounded, color: Colors.redAccent),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text('LIVE SESSION NOW', style: TextStyle(color: Colors.redAccent, fontWeight: FontWeight.w900, fontSize: 12)),
+                    Text('Join Prof. ${data['tutorName']} for a live explanation.', style: const TextStyle(fontSize: 11, color: Colors.black87)),
+                  ],
+                ),
+              ),
+              ElevatedButton(
+                onPressed: () => launchUrl(Uri.parse(data['link'])),
+                style: ElevatedButton.styleFrom(backgroundColor: Colors.redAccent, foregroundColor: Colors.white, elevation: 0),
+                child: const Text('JOIN'),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 

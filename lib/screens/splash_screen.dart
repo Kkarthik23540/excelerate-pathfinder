@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import '../theme/app_theme_splash.dart';
 import 'admin/admin_home_screen.dart';
 import 'learner/learner_home_screen.dart';
+import 'tutor/tutor_home_screen.dart'; // ✅ Added Tutor Home
 import 'admin/admin_login_screen.dart';
 import 'learner/learner_login_screen.dart';
 
@@ -116,6 +117,12 @@ class _SplashScreenState extends State<SplashScreen>
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(builder: (_) => const AdminHomeScreen()),
+            );
+          } else if (role == 'tutor') {
+            // ✅ Handle Tutor Role
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (_) => const TutorHomeScreen()),
             );
           } else {
             Navigator.pushReplacement(
