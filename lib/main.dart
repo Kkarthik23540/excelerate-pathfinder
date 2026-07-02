@@ -28,7 +28,9 @@ class ExcelerateApp extends StatefulWidget {
 
 class _ExcelerateAppState extends State<ExcelerateApp> {
   late StreamSubscription<List<ConnectivityResult>> _connectivitySubscription;
+  StreamSubscription<QuerySnapshot>? _announcementSubscription;
   bool _isOffline = false;
+  final GlobalKey<ScaffoldMessengerState> _scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
 
   @override
   void initState() {
@@ -37,8 +39,21 @@ class _ExcelerateAppState extends State<ExcelerateApp> {
       final isOffline = results.contains(ConnectivityResult.none) || results.isEmpty;
       if (isOffline != _isOffline) {
         setState(() => _isOffline = isOffline);
-        if (isOffline) {
-          _showNoInternetDialog();
+      }
+    });
+
+    // ✅ LIVE GLOBAL ANNOUNCEMENT LISTENER
+    // Listen for new announcements added AFTER the app started
+    final startTime = DateTime.now();
+    _announcementSubscription = FirebaseFirestore.instance
+        .collection('announcements')
+        .where('createdAt', isGreaterThan: startTime)
+        .snapshots()
+        .listen((snapshot) {
+      for (var change in snapshot.docChanges) {
+        if (change.type == DocumentChangeType.added) {
+          final data = change.doc.data() as Map<String, dynamic>;
+          _showLiveNotification(data['title'] ?? 'New Update');
         }
       }
     });
@@ -47,17 +62,42 @@ class _ExcelerateAppState extends State<ExcelerateApp> {
   @override
   void dispose() {
     _connectivitySubscription.cancel();
+    _announcementSubscription?.cancel();
     super.dispose();
   }
 
-  void _showNoInternetDialog() {
-    // We use a global key or just rely on the next context. 
-    // For simplicity, since it's an overlay, we'll wait for the navigator context.
+  void _showLiveNotification(String title) {
+    _scaffoldMessengerKey.currentState?.showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            const Icon(Icons.campaign_rounded, color: Colors.white),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text('LATEST UPDATE', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.white70)),
+                  Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
+                ],
+              ),
+            ),
+          ],
+        ),
+        backgroundColor: const Color(0xFF1E40AF),
+        behavior: SnackBarBehavior.floating,
+        margin: const EdgeInsets.all(16),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        duration: const Duration(seconds: 4),
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      scaffoldMessengerKey: _scaffoldMessengerKey,
       title: 'Excelerate Pathfinder',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(

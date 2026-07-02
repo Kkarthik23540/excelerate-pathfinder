@@ -28,16 +28,27 @@ class AdminHomeScreen extends StatefulWidget {
   State<AdminHomeScreen> createState() => _AdminHomeScreenState();
 }
 
-class _AdminHomeScreenState extends State<AdminHomeScreen> {
+class _AdminHomeScreenState extends State<AdminHomeScreen> with SingleTickerProviderStateMixin {
   String? _adminId;
   String _adminName = "Admin";
   String _adminRole = "admin";
+  late AnimationController _pulseController;
 
   @override
   void initState() {
     super.initState();
     _adminId = FirebaseAuth.instance.currentUser?.uid;
     _loadAdminData();
+    _pulseController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 2),
+    )..repeat(reverse: true);
+  }
+
+  @override
+  void dispose() {
+    _pulseController.dispose();
+    super.dispose();
   }
 
   Future<void> _loadAdminData() async {
@@ -250,11 +261,20 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(Icons.bolt_rounded,
-                        color: Colors.white, size: 12),
-                    const SizedBox(width: 4),
+                    FadeTransition(
+                      opacity: _pulseController,
+                      child: Container(
+                        width: 8,
+                        height: 8,
+                        decoration: const BoxDecoration(
+                          color: Colors.greenAccent,
+                          shape: BoxShape.circle,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 6),
                     Text(
-                      _adminRole.toUpperCase(),
+                      "LIVE MONITORING",
                       style: const TextStyle(
                         color: Colors.white,
                         fontSize: 10,
