@@ -90,36 +90,58 @@ class _LearnerHomeScreenState extends State<LearnerHomeScreen>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: kBg,
-      body: SafeArea(
-        bottom: false,
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              _buildAppBar(),
-              const SizedBox(height: 20),
-              _buildHeroSection(),
-              const SizedBox(height: 20),
-              _buildSearchBar(),
-              const SizedBox(height: 20),
-              _buildStatsRow(),
-              const SizedBox(height: 24),
-              _buildCategoryTabs(),
-              const SizedBox(height: 24),
-              _buildContinueLearning(),
-              const SizedBox(height: 24),
-              _buildQuickActions(),
-              const SizedBox(height: 24),
-              _buildAnnouncements(),
+    return WillPopScope(
+      onWillPop: () async {
+        final shouldPop = await showDialog<bool>(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('Exit App?'),
+            content: const Text('Are you sure you want to close Excelerate Pathfinder?'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: const Text('NO'),
+              ),
+              TextButton(
+                onPressed: () => Navigator.pop(context, true),
+                child: const Text('YES', style: TextStyle(color: kPrimary)),
+              ),
             ],
           ),
+        );
+        return shouldPop ?? false;
+      },
+      child: Scaffold(
+        backgroundColor: kBg,
+        body: SafeArea(
+          bottom: false,
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                _buildAppBar(),
+                const SizedBox(height: 20),
+                _buildHeroSection(),
+                const SizedBox(height: 20),
+                _buildSearchBar(),
+                const SizedBox(height: 20),
+                _buildStatsRow(),
+                const SizedBox(height: 24),
+                _buildCategoryTabs(),
+                const SizedBox(height: 24),
+                _buildContinueLearning(),
+                const SizedBox(height: 24),
+                _buildQuickActions(),
+                const SizedBox(height: 24),
+                _buildAnnouncements(),
+              ],
+            ),
+          ),
         ),
-      ),
-      bottomNavigationBar: const BottomNav(
-        currentDestination: HomeNavDestination.home,
+        bottomNavigationBar: const BottomNav(
+          currentDestination: HomeNavDestination.home,
+        ),
       ),
     );
   }

@@ -59,33 +59,55 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: kBg,
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              _buildAppBar(),
-              const SizedBox(height: 20),
-              _buildHeroSection(),
-              const SizedBox(height: 20),
-              _buildPendingApprovalsCard(),
-              const SizedBox(height: 20),
-              _buildStatsRow(),
-              const SizedBox(height: 24),
-              _buildRecentActivity(),
-              const SizedBox(height: 24),
-              _buildQuickActions(),
-              const SizedBox(height: 20),
-              _buildSystemHealthCard(),
+    return WillPopScope(
+      onWillPop: () async {
+        final shouldPop = await showDialog<bool>(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('Exit Admin Portal?'),
+            content: const Text('Are you sure you want to close the application?'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: const Text('NO'),
+              ),
+              TextButton(
+                onPressed: () => Navigator.pop(context, true),
+                child: const Text('YES', style: TextStyle(color: kAdminDanger)),
+              ),
             ],
           ),
+        );
+        return shouldPop ?? false;
+      },
+      child: Scaffold(
+        backgroundColor: kBg,
+        body: SafeArea(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                _buildAppBar(),
+                const SizedBox(height: 20),
+                _buildHeroSection(),
+                const SizedBox(height: 20),
+                _buildPendingApprovalsCard(),
+                const SizedBox(height: 20),
+                _buildStatsRow(),
+                const SizedBox(height: 24),
+                _buildRecentActivity(),
+                const SizedBox(height: 24),
+                _buildQuickActions(),
+                const SizedBox(height: 20),
+                _buildSystemHealthCard(),
+              ],
+            ),
+          ),
         ),
-      ),
-      bottomNavigationBar: const AdminBottomNav(
-        currentDestination: AdminNavDestination.dashboard,
+        bottomNavigationBar: const AdminBottomNav(
+          currentDestination: AdminNavDestination.dashboard,
+        ),
       ),
     );
   }
