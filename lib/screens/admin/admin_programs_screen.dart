@@ -15,6 +15,7 @@ class AdminProgramsScreen extends StatefulWidget {
 class _AdminProgramsScreenState extends State<AdminProgramsScreen> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   bool _isAdding = false;
+  bool _isSubmitting = false;
   String? _editingDocId;
 
   final _titleController = TextEditingController();
@@ -77,6 +78,7 @@ class _AdminProgramsScreenState extends State<AdminProgramsScreen> {
       'updatedAt': FieldValue.serverTimestamp(),
     };
 
+    setState(() => _isSubmitting = true);
     try {
       final adminId = FirebaseAuth.instance.currentUser?.uid;
       
@@ -117,6 +119,8 @@ class _AdminProgramsScreenState extends State<AdminProgramsScreen> {
           SnackBar(content: Text('Error: $e')),
         );
       }
+    } finally {
+      if (mounted) setState(() => _isSubmitting = false);
     }
   }
 
@@ -238,15 +242,17 @@ class _AdminProgramsScreenState extends State<AdminProgramsScreen> {
               const SizedBox(width: 16),
               Expanded(
                 child: ElevatedButton(
-                  onPressed: _publishProgram,
+                  onPressed: _isSubmitting ? null : _publishProgram,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFFE0194A),
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                     elevation: 0,
                   ),
-                  child: Text(_editingDocId != null ? 'Save Changes' : 'Publish Now', 
-                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                  child: _isSubmitting 
+                    ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
+                    : Text(_editingDocId != null ? 'Save Changes' : 'Publish Now', 
+                        style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
                 ),
               ),
             ],
@@ -336,31 +342,46 @@ class _AdminProgramsScreenState extends State<AdminProgramsScreen> {
   }
 
   void _confirmDelete(String docId, String title) {
+    bool isDeleting = false;
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Delete Program?'),
-        content: Text('Are you sure you want to remove "$title"? This cannot be undone.'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () async {
-              final adminId = FirebaseAuth.instance.currentUser?.uid;
-              await _firestore.collection('programs').doc(docId).delete();
-              await _firestore.collection('audit_logs').add({
-                'action': 'PROGRAM_DELETED',
-                'performedBy': adminId,
-                'timestamp': FieldValue.serverTimestamp(),
-                'details': 'Deleted $title'
-              });
-              if (mounted) Navigator.pop(context);
-            },
-            child: const Text('Delete', style: TextStyle(color: Colors.red)),
-          ),
-        ],
+      builder: (context) => StatefulBuilder(
+        builder: (context, setDialogState) => AlertDialog(
+          title: const Text('Delete Program?'),
+          content: Text('Are you sure you want to remove "$title"? This cannot be undone.'),
+          actions: [
+            TextButton(
+              onPressed: isDeleting ? null : () => Navigator.pop(context),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: isDeleting ? null : () async {
+                setDialogState(() => isDeleting = true);
+                try {
+                  final adminId = FirebaseAuth.instance.currentUser?.uid;
+                  await _firestore.collection('programs').doc(docId).delete();
+                  await _firestore.collection('audit_logs').add({
+                    'action': 'PROGRAM_DELETED',
+                    'performedBy': adminId,
+                    'timestamp': FieldValue.serverTimestamp(),
+                    'details': 'Deleted $title'
+                  });
+                  if (mounted) Navigator.pop(context);
+                } catch (e) {
+                  setDialogState(() => isDeleting = false);
+                  if (mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Delete failed: $e')),
+                    );
+                  }
+                }
+              },
+              child: isDeleting 
+                ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2))
+                : const Text('Delete', style: TextStyle(color: Colors.red)),
+            ),
+          ],
+        ),
       ),
     );
   }

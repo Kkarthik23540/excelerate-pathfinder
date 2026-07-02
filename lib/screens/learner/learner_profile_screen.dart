@@ -35,6 +35,7 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen> {
   String? _userId;
   bool _isEditMode = false;
+  bool _isSaving = false;
   int _totalShares = 0;
 
   @override
@@ -547,7 +548,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     child: MouseRegion(
                       cursor: SystemMouseCursors.click,
                       child: ElevatedButton(
-                        onPressed: () async {
+                        onPressed: _isSaving ? null : () async {
                           await _saveProfile(
                             name: nameCtrl.text.trim(),
                             phone: phoneCtrl.text.trim(),
@@ -563,10 +564,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(10)),
                         ),
-                        child: const Text('Save Changes',
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.w700)),
+                        child: _isSaving
+                          ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
+                          : const Text('Save Changes',
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w700)),
                       ),
                     ),
                   ),
@@ -614,6 +617,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       _showSnackbar('Name cannot be empty', isError: true);
       return;
     }
+    setState(() => _isSaving = true);
     try {
       await _userRef!.update({
         'displayName': name,
@@ -625,6 +629,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
       _showSnackbar('✅ Profile updated!');
     } catch (e) {
       _showSnackbar('Error: $e', isError: true);
+    } finally {
+      if (mounted) setState(() => _isSaving = false);
     }
   }
 
@@ -937,101 +943,113 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
     final result = await showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: const Row(
-          children: [
-            Icon(Icons.lock_outline, color: kPrimary),
-            SizedBox(width: 8),
-            Text('Change Password'),
-          ],
-        ),
-        content: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                controller: currentPassCtrl,
-                obscureText: true,
-                decoration: const InputDecoration(
-                  labelText: 'Current Password',
-                  border: OutlineInputBorder(),
-                ),
+      builder: (context) => StatefulBuilder(
+        builder: (context, setDialogState) {
+          bool isChanging = false;
+          return AlertDialog(
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            title: const Row(
+              children: [
+                Icon(Icons.lock_outline, color: kPrimary),
+                SizedBox(width: 8),
+                Text('Change Password'),
+              ],
+            ),
+            content: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextField(
+                    controller: currentPassCtrl,
+                    obscureText: true,
+                    decoration: const InputDecoration(
+                      labelText: 'Current Password',
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  TextField(
+                    controller: newPassCtrl,
+                    obscureText: true,
+                    decoration: const InputDecoration(
+                      labelText: 'New Password',
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  TextField(
+                    controller: confirmPassCtrl,
+                    obscureText: true,
+                    decoration: const InputDecoration(
+                      labelText: 'Confirm New Password',
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                ],
               ),
-              const SizedBox(height: 12),
-              TextField(
-                controller: newPassCtrl,
-                obscureText: true,
-                decoration: const InputDecoration(
-                  labelText: 'New Password',
-                  border: OutlineInputBorder(),
-                ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: isChanging ? null : () => Navigator.pop(context, false),
+                child: const Text('Cancel'),
               ),
-              const SizedBox(height: 12),
-              TextField(
-                controller: confirmPassCtrl,
-                obscureText: true,
-                decoration: const InputDecoration(
-                  labelText: 'Confirm New Password',
-                  border: OutlineInputBorder(),
-                ),
+              ElevatedButton(
+                onPressed: isChanging ? null : () async {
+                  if (currentPassCtrl.text.isEmpty ||
+                      newPassCtrl.text.isEmpty ||
+                      confirmPassCtrl.text.isEmpty) {
+                    _showSnackbar('All fields are required', isError: true);
+                    return;
+                  }
+                  if (newPassCtrl.text != confirmPassCtrl.text) {
+                    _showSnackbar('New passwords do not match', isError: true);
+                    return;
+                  }
+                  if (newPassCtrl.text.length < 6) {
+                    _showSnackbar('Password must be 6+ characters', isError: true);
+                    return;
+                  }
+
+                  setDialogState(() => isChanging = true);
+                  try {
+                    final user = FirebaseAuth.instance.currentUser;
+                    if (user == null || user.email == null) return;
+
+                    final credential = EmailAuthProvider.credential(
+                      email: user.email!,
+                      password: currentPassCtrl.text,
+                    );
+                    await user.reauthenticateWithCredential(credential);
+                    await user.updatePassword(newPassCtrl.text);
+                    if (context.mounted) Navigator.pop(context, true);
+                  } on FirebaseAuthException catch (e) {
+                    String errorMsg = 'Failed to change password';
+                    if (e.code == 'wrong-password') {
+                      errorMsg = 'Current password is incorrect';
+                    } else if (e.code == 'weak-password') {
+                      errorMsg = 'New password is too weak';
+                    } else if (e.message != null) {
+                      errorMsg = e.message!;
+                    }
+                    setDialogState(() => isChanging = false);
+                    if (mounted) {
+                      _showSnackbar(errorMsg, isError: true);
+                    }
+                  } catch (e) {
+                    setDialogState(() => isChanging = false);
+                    if (mounted) {
+                      _showSnackbar('Error: $e', isError: true);
+                    }
+                  }
+                },
+                style: ElevatedButton.styleFrom(backgroundColor: kPrimary),
+                child: isChanging 
+                  ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
+                  : const Text('Update', style: TextStyle(color: Colors.white)),
               ),
             ],
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancel'),
-          ),
-          ElevatedButton(
-            onPressed: () async {
-              if (currentPassCtrl.text.isEmpty ||
-                  newPassCtrl.text.isEmpty ||
-                  confirmPassCtrl.text.isEmpty) {
-                _showSnackbar('All fields are required', isError: true);
-                return;
-              }
-              if (newPassCtrl.text != confirmPassCtrl.text) {
-                _showSnackbar('New passwords do not match', isError: true);
-                return;
-              }
-              if (newPassCtrl.text.length < 6) {
-                _showSnackbar('Password must be 6+ characters', isError: true);
-                return;
-              }
-
-              try {
-                final user = FirebaseAuth.instance.currentUser;
-                if (user == null || user.email == null) return;
-
-                final credential = EmailAuthProvider.credential(
-                  email: user.email!,
-                  password: currentPassCtrl.text,
-                );
-                await user.reauthenticateWithCredential(credential);
-                await user.updatePassword(newPassCtrl.text);
-                Navigator.pop(context, true);
-              } on FirebaseAuthException catch (e) {
-                String errorMsg = 'Failed to change password';
-                if (e.code == 'wrong-password') {
-                  errorMsg = 'Current password is incorrect';
-                } else if (e.code == 'weak-password') {
-                  errorMsg = 'New password is too weak';
-                } else if (e.message != null) {
-                  errorMsg = e.message!;
-                }
-                if (mounted) {
-                  _showSnackbar(errorMsg, isError: true);
-                }
-                Navigator.pop(context, false);
-              }
-            },
-            style: ElevatedButton.styleFrom(backgroundColor: kPrimary),
-            child: const Text('Update',
-                style: TextStyle(color: Colors.white)),
-          ),
-        ],
+          );
+        },
       ),
     );
 
